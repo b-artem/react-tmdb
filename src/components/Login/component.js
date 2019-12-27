@@ -1,12 +1,12 @@
 import React from 'react'
-// import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 
 import {
   Button, Col, Form, Icon, Input, Layout, Row, Typography
 } from 'antd'
 
-// import classes from './Auth.css'
-// import * as actions from '../../store/actions/index'
+import { actions } from './actions'
 
 class Login extends React.Component {
   constructor(props) {
@@ -16,8 +16,7 @@ class Login extends React.Component {
       username: '',
       password: '',
       usernameHasError: false,
-      passwordHasError: false,
-      loading: false
+      passwordHasError: false
     }
 
     this.usernameChangedHandler = this.usernameChangedHandler.bind(this)
@@ -25,6 +24,7 @@ class Login extends React.Component {
 
     this.validate = this.validate.bind(this)
     this.handleLoginClick = this.handleLoginClick.bind(this)
+    this.submitHandler = this.submitHandler.bind(this)
   }
 
   usernameChangedHandler(event) {
@@ -55,46 +55,25 @@ class Login extends React.Component {
     return isValid
   }
 
-  handleLoginClick() {
-    console.log(this.validate())
+  handleLoginClick(event) {
+    if (!this.validate()) {
+      event.preventDefault()
+    }
   }
 
+  submitHandler(event) {
+    const { username, password } = this.state
+    const { onAuth } = this.props
 
-
-  // checkValidity( value, rules ) {
-  //     let isValid = true;
-  //     if ( !rules ) {
-  //         return true;
-  //     }
-  //
-  //     if ( rules.required ) {
-  //         isValid = value.trim() !== '' && isValid;
-  //     }
-  //
-  //     if ( rules.minLength ) {
-  //         isValid = value.length >= rules.minLength && isValid
-  //     }
-  //
-  //     if ( rules.maxLength ) {
-  //         isValid = value.length <= rules.maxLength && isValid
-  //     }
-  //
-  //     if ( rules.isEmail ) {
-  //         const pattern = /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/;
-  //         isValid = pattern.test( value ) && isValid
-  //     }
-  //
-  //     if ( rules.isNumeric ) {
-  //         const pattern = /^\d+$/;
-  //         isValid = pattern.test( value ) && isValid
-  //     }
-  //
-  //     return isValid;
-  // }
+    event.preventDefault()
+    onAuth(username, password)
+  }
 
   render() {
-    const { username, loading, usernameHasError, passwordHasError } = this.state
-    // debugger
+    const { loading } = this.props
+    const {
+      username, usernameHasError, passwordHasError
+    } = this.state
 
     return (
       <div className="center">
@@ -105,7 +84,7 @@ class Login extends React.Component {
               justify="center"
             >
               <Col>
-                <Form>
+                <Form onSubmit={this.submitHandler}>
                   <Typography.Title>The Movie DB</Typography.Title>
                   <Form.Item
                     validateStatus={usernameHasError ? 'error' : ''}
@@ -144,7 +123,7 @@ class Login extends React.Component {
                       loading={loading}
                       type="primary"
                       htmlType="submit"
-                      onClick={this.handleLoginClick}
+                      onClick={event => this.handleLoginClick(event)}
                     >
                       Log in
                     </Button>
@@ -159,71 +138,22 @@ class Login extends React.Component {
   }
 }
 
-// export default connect( null, mapDispatchToProps )( Auth );
-export default Login
+Login.propTypes = {
+  onAuth: PropTypes.func.isRequired,
+  loading: PropTypes.bool
+}
 
+Login.defaultProps = {
+  loading: true
+}
 
-  // inputChangedHandler = ( event, controlName ) => {
-  //     const updatedControls = {
-  //         ...this.state.controls,
-  //         [controlName]: {
-  //             ...this.state.controls[controlName],
-  //             value: event.target.value,
-  //             valid: this.checkValidity( event.target.value, this.state.controls[controlName].validation ),
-  //             touched: true
-  //         }
-  //     };
-  //     this.setState( { controls: updatedControls } );
-  // }
+const mapStateToProps = (state) => {
+  const { loading } = state.login
+  return { loading }
+}
 
-  // submitHandler = ( event ) => {
-  //     event.preventDefault();
-  //     this.props.onAuth( this.state.controls.email.value, this.state.controls.password.value, this.state.isSignup );
-  // }
-  //
-  // switchAuthModeHandler = () => {
-  //     this.setState(prevState => {
-  //         return {isSignup: !prevState.isSignup};
-  //     });
-  // }
+const mapDispatchToProps = dispatch => ({
+  onAuth: (username, password) => dispatch(actions.auth(username, password))
+})
 
-//   render () {
-//       const formElementsArray = [];
-//       for ( let key in this.state.controls ) {
-//           formElementsArray.push( {
-//               id: key,
-//               config: this.state.controls[key]
-//           } );
-//       }
-//
-//       const form = formElementsArray.map( formElement => (
-//           <Input
-//               key={formElement.id}
-//               elementType={formElement.config.elementType}
-//               elementConfig={formElement.config.elementConfig}
-//               value={formElement.config.value}
-//               invalid={!formElement.config.valid}
-//               shouldValidate={formElement.config.validation}
-//               touched={formElement.config.touched}
-//               changed={( event ) => this.inputChangedHandler( event, formElement.id )} />
-//       ) );
-//
-//       return (
-//           <div className={classes.Auth}>
-//               <form onSubmit={this.submitHandler}>
-//                   {form}
-//                   <Button btnType="Success">SUBMIT</Button>
-//               </form>
-//               <Button
-//                   clicked={this.switchAuthModeHandler}
-//                   btnType="Danger">SWITCH TO {this.state.isSignup ? 'SIGNIN' : 'SIGNUP'}</Button>
-//           </div>
-//       );
-//   }
-// }
-
-// const mapDispatchToProps = dispatch => {
-//     return {
-//         onAuth: ( email, password, isSignup ) => dispatch( actions.auth( email, password, isSignup ) )
-//     };
-// };
+export default connect(mapStateToProps, mapDispatchToProps)(Login)

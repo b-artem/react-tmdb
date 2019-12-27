@@ -1,3 +1,8 @@
-const reducers = () => ({})
+import { combineReducers } from 'redux'
 
-export default reducers
+import { key as loginKey } from '../components/Login/actions'
+import loginReducer from '../components/Login/reducer'
+
+export default combineReducers({
+  [loginKey]: loginReducer
+})

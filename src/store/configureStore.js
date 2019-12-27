@@ -1,8 +1,11 @@
 import { createLogicMiddleware } from 'redux-logic'
 import { createStore, applyMiddleware } from 'redux'
 
+import Cookies from 'js-cookie'
+import client from '../api/client'
 import logics from './logics'
 import rootReducer from './rootReducer'
+
 
 const bindMiddleware = (middleware) => {
   if (process.env.NODE_ENV !== 'production') {
@@ -17,7 +20,10 @@ const bindMiddleware = (middleware) => {
 
 const configureStore = (initialState = {}) => {
   // Add dependencies to pass them to logic functions
-  const dependencies = {}
+  const dependencies = {
+    httpClient: client,
+    cookies: Cookies
+  }
 
   const logicMiddleware = createLogicMiddleware(logics, dependencies)
   const store = createStore(rootReducer, initialState, bindMiddleware([logicMiddleware]))
