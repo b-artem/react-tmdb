@@ -2,7 +2,8 @@ import { createLogic } from 'redux-logic'
 import {
   AUTH_GET_TOKEN, AUTH_VALIDATE_TOKEN, AUTH_CREATE_SESSION, AUTH_STORE_SESSION,
   AUTH_SUCCESS, AUTH_FAIL
-} from './actions'
+} from '../../components/Login/actions'
+import { LOGOUT, LOGOUT_SUCCESS, LOGOUT_FAIL } from '../../components/Logout/actions'
 
 export const getTokenLogic = createLogic({
   type: AUTH_GET_TOKEN,
@@ -29,7 +30,7 @@ export const validateTokenLogic = createLogic({
   },
 
   process({ httpClient, getState }) {
-    const { username, password, requestToken } = getState().login
+    const { username, password, requestToken } = getState().auth
 
     return httpClient.post(
       '/authentication/token/validate_with_login',
@@ -48,7 +49,7 @@ export const createSessionLogic = createLogic({
   },
 
   process({ httpClient, getState }) {
-    const { requestToken } = getState().login
+    const { requestToken } = getState().auth
 
     return httpClient.post(
       '/authentication/session/new',
@@ -67,8 +68,32 @@ export const storeSessionLogic = createLogic({
   },
 
   process({ cookies, getState }) {
-    const { sessionId } = getState().login
-    return cookies.set('session_id', sessionId, { secure: true })
+    const { sessionId } = getState().auth
+    return cookies.set('session_id', sessionId)
+  }
+})
+
+export const logoutLogic = createLogic({
+  type: LOGOUT,
+
+  processOptions: {
+    successType: LOGOUT_SUCCESS,
+    failType: LOGOUT_FAIL
+  },
+
+  process({ httpClient, cookies }) {
+    const sessionId = cookies.get('session_id')
+
+    return httpClient.delete(
+      '/authentication/session',
+      {
+        data: { session_id: sessionId },
+        params: { api_key: process.env.API_KEY }
+      }
+    ).then((resp) => {
+      cookies.remove('session_id')
+      return resp.data
+    })
   }
 })
 
@@ -76,5 +101,6 @@ export default [
   getTokenLogic,
   validateTokenLogic,
   createSessionLogic,
-  storeSessionLogic
+  storeSessionLogic,
+  logoutLogic
 ]

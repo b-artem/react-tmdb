@@ -1,4 +1,4 @@
-export const key = 'login'
+export const key = 'auth'
 
 export const AUTH_GET_TOKEN = 'AUTH_GET_TOKEN'
 export const AUTH_VALIDATE_TOKEN = 'AUTH_VALIDATE_TOKEN'

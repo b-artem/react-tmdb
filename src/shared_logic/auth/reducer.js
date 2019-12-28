@@ -1,9 +1,11 @@
 import {
   AUTH_GET_TOKEN, AUTH_VALIDATE_TOKEN, AUTH_CREATE_SESSION, AUTH_STORE_SESSION,
   AUTH_SUCCESS, AUTH_FAIL
-} from './actions'
+} from '../../components/Login/actions'
+import { LOGOUT, LOGOUT_SUCCESS, LOGOUT_FAIL } from '../../components/Logout/actions'
 
 const initialState = {
+  isAuthenticated: false,
   loading: false
 }
 
@@ -42,16 +44,27 @@ export default function reducer(state = initialState, action) {
     case AUTH_SUCCESS: {
       return {
         ...state,
+        isAuthenticated: true,
         loading: false
       }
     }
     case AUTH_FAIL: {
       return {
         ...state,
+        isAuthenticated: false,
         loading: false,
         errorStatus: `Authentication error: ${action.payload.status}`
       }
     }
+    case LOGOUT:
+      return state
+    case LOGOUT_SUCCESS:
+      return {
+        ...state,
+        isAuthenticated: false
+      }
+    case LOGOUT_FAIL:
+      return state
     default:
       return state
   }

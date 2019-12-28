@@ -3,8 +3,9 @@ import {
   Link, Route, BrowserRouter as Router, Switch
 } from 'react-router-dom'
 
+import PrivateRoute from '../PrivateRoute'
 import Login from '../Login'
-// import Dashboard from '../Dashboard'
+import Dashboard from '../Dashboard'
 // import DashboardEmpty from '../DashboardEmpty'
 // import DashboardLoading from '../DashboardLoading'
 // import Movie from '../Movie'
@@ -18,6 +19,9 @@ const Links = () => (
     <div>
       <Link to="/login">Login</Link>
     </div>
+    <div>
+      <Link to="/dashboard">Dashboard with content</Link>
+    </div>
   </React.Fragment>
 )
 
@@ -27,6 +31,14 @@ const Root = () => (
       <Route
         path="/login"
         component={Login}
+      />
+      <PrivateRoute
+        path="/"
+        component={Dashboard}
+      />
+      <PrivateRoute
+        path="/dashboard"
+        component={Dashboard}
       />
       <Route component={Links} />
     </Switch>

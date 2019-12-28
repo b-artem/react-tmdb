@@ -1,5 +1,5 @@
-import loginLogic from '../components/Login/logic'
+import authLogic from '../shared_logic/auth/logic'
 
 export default [
-  ...loginLogic
+  ...authLogic
 ]

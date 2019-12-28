@@ -1,12 +1,14 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { Redirect } from 'react-router-dom'
 
 import {
   Button, Col, Form, Icon, Input, Layout, Row, Typography
 } from 'antd'
 
 import { actions } from './actions'
+import isLoggedIn from '../../helpers/isLoggedIn'
 
 class Login extends React.Component {
   constructor(props) {
@@ -70,10 +72,17 @@ class Login extends React.Component {
   }
 
   render() {
-    const { loading } = this.props
+    const {
+      loading, isAuthenticated, location
+    } = this.props
     const {
       username, usernameHasError, passwordHasError
     } = this.state
+
+    const from = location.state || { pathname: '/' }
+    if (isLoggedIn(isAuthenticated)) {
+      return <Redirect to={from} />
+    }
 
     return (
       <div className="center">
@@ -140,7 +149,11 @@ class Login extends React.Component {
 
 Login.propTypes = {
   onAuth: PropTypes.func.isRequired,
-  loading: PropTypes.bool
+  isAuthenticated: PropTypes.bool.isRequired,
+  loading: PropTypes.bool,
+  location: PropTypes.shape({
+    pathname: PropTypes.string
+  }).isRequired
 }
 
 Login.defaultProps = {
@@ -148,8 +161,8 @@ Login.defaultProps = {
 }
 
 const mapStateToProps = (state) => {
-  const { loading } = state.login
-  return { loading }
+  const { loading, isAuthenticated } = state.auth
+  return { loading, isAuthenticated }
 }
 
 const mapDispatchToProps = dispatch => ({
