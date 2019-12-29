@@ -8,7 +8,6 @@ import {
 } from 'antd'
 
 import { actions } from './actions'
-import isLoggedIn from '../../helpers/isLoggedIn'
 
 class Login extends React.Component {
   constructor(props) {
@@ -80,7 +79,7 @@ class Login extends React.Component {
     } = this.state
 
     const from = location.state || { pathname: '/' }
-    if (isLoggedIn(isAuthenticated)) {
+    if (isAuthenticated) {
       return <Redirect to={from} />
     }
 

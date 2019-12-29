@@ -5,13 +5,12 @@ import {
 
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import isLoggedIn from '../../helpers/isLoggedIn'
 
-const PrivateRoute = ({ component: Component, ...rest }) => (
+const PrivateRoute = ({ component: Component, isAuthenticated, ...rest }) => (
   <Route
     {...rest}
     render={props => (
-      isLoggedIn(props.isAuthenticated)
+      isAuthenticated
         ? <Component {...props} />
         : (
           <Redirect to={{
