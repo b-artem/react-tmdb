@@ -27,7 +27,7 @@ export default function reducer(state = initialState, action) {
         loading: true
       }
     case AUTH_CREATE_SESSION: {
-      const { username, password, ...newState } = state
+      const { password, ...newState } = state
       return {
         ...newState,
         loading: true
@@ -49,8 +49,9 @@ export default function reducer(state = initialState, action) {
       }
     }
     case AUTH_FAIL: {
+      const { username, ...newState } = state
       return {
-        ...state,
+        ...newState,
         isAuthenticated: false,
         loading: false,
         errorStatus: `Authentication error: ${action.payload.status}`
@@ -58,11 +59,13 @@ export default function reducer(state = initialState, action) {
     }
     case LOGOUT:
       return state
-    case LOGOUT_SUCCESS:
+    case LOGOUT_SUCCESS: {
+      const { username, ...newState } = state
       return {
-        ...state,
+        ...newState,
         isAuthenticated: false
       }
+    }
     case LOGOUT_FAIL:
       return state
     default:

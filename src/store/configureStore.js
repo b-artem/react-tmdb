@@ -20,7 +20,8 @@ const bindMiddleware = (middleware) => {
 }
 
 const persistConfig = {
-  key: 'root',
+  key: 'auth',
+  whitelist: ['auth'],
   storage
 }
 

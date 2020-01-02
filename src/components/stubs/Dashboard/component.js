@@ -5,7 +5,7 @@ import {
 import { range } from 'lodash'
 
 import Header from '../Header'
-import Movie from '../MovieItem'
+import MovieItem from '../MovieItem'
 
 const Dashboard = () => (
   <Layout>
@@ -45,7 +45,7 @@ const Dashboard = () => (
                 lg={{ span: 6 }}
                 xl={{ span: 4 }}
               >
-                <Movie />
+                <MovieItem />
               </Col>
             ))}
           </Col>

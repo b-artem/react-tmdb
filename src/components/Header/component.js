@@ -1,4 +1,6 @@
 import React from 'react'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import {
   Typography, Row, Col, Avatar, Dropdown, Icon, Menu, Layout
 } from 'antd'
@@ -26,28 +28,41 @@ const Overlay = () => (
   </Menu>
 )
 
-const Header = () => (
-  <Layout.Header>
-    <Row
-      type="flex"
-      justify="space-between"
-    >
-      <Col>
-        <Typography.Text>THE MOVIE DB</Typography.Text>
-      </Col>
-      <Col>
-        <Avatar icon="user" />
-        {' '}
-        <Dropdown overlay={Overlay}>
-          <Typography.Text>
-            Username
-            {' '}
-            <Icon type="caret-down" />
-          </Typography.Text>
-        </Dropdown>
-      </Col>
-    </Row>
-  </Layout.Header>
-)
+const Header = (props) => {
+  const { username } = props
 
-export default Header
+  return (
+    <Layout.Header>
+      <Row
+        type="flex"
+        justify="space-between"
+      >
+        <Col>
+          <Typography.Text>THE MOVIE DB</Typography.Text>
+        </Col>
+        <Col>
+          <Avatar icon="user" />
+          {' '}
+          <Dropdown overlay={Overlay}>
+            <Typography.Text>
+              {username}
+              {' '}
+              <Icon type="caret-down" />
+            </Typography.Text>
+          </Dropdown>
+        </Col>
+      </Row>
+    </Layout.Header>
+  )
+}
+
+Header.propTypes = {
+  username: PropTypes.string.isRequired
+}
+
+const mapStateToProps = (state) => {
+  const { username } = state.auth
+  return { username }
+}
+
+export default connect(mapStateToProps)(Header)
