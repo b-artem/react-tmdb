@@ -1,5 +1,6 @@
 import {
-  DASHBOARD_FETCH, DASHBOARD_FETCH_SUCCESS, DASHBOARD_FETCH_FAIL
+  DASHBOARD_FETCH, DASHBOARD_FETCH_SUCCESS, DASHBOARD_FETCH_FAIL,
+  DASHBOARD_SEARCH, DASHBOARD_SEARCH_VALIDATION_SUCCESS, DASHBOARD_SEARCH_VALIDATION_FAIL
 } from './actions'
 import { modes, statuses } from './component'
 
@@ -19,7 +20,7 @@ export default function reducer(state = initialState, action) {
     case DASHBOARD_FETCH_SUCCESS:
       return {
         ...state,
-        status: statuses.LOADED,
+        status: action.payload.movies.length ? statuses.LOADED : statuses.EMPTY,
         movies: action.payload.movies,
         page: action.payload.page,
         totalResults: action.payload.totalResults
@@ -29,6 +30,25 @@ export default function reducer(state = initialState, action) {
       return {
         ...newState,
         status: statuses.INITIAL_LOADING
+      }
+    }
+    case DASHBOARD_SEARCH: {
+      return {
+        ...state,
+        query: action.query
+      }
+    }
+    case DASHBOARD_SEARCH_VALIDATION_SUCCESS: {
+      return {
+        ...state,
+        mode: modes.SEARCH,
+        queryHasError: false
+      }
+    }
+    case DASHBOARD_SEARCH_VALIDATION_FAIL: {
+      return {
+        ...state,
+        queryHasError: true
       }
     }
     default:

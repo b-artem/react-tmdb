@@ -32,11 +32,11 @@ export const statuses = {
 
 const Dashboard = (props) => {
   const {
-    status, onFetch, movies, page, totalResults
+    status, onFetch, onSearch, movies, page, totalResults
   } = props
 
   if (status !== LOADED) {
-    onFetch()
+    onFetch(page)
   }
 
   let content
@@ -111,7 +111,7 @@ const Dashboard = (props) => {
           total={totalResults}
           className="pagination"
           disabled={status !== LOADED}
-          onChange={onFetch}
+          onChange={newPage => onFetch(newPage)}
         />
       </Col>
     </Row>
@@ -134,6 +134,7 @@ const Dashboard = (props) => {
               size="large"
               enterButton="Search"
               className="top-margin"
+              onSearch={query => onSearch(query)}
             />
           </Col>
         </Row>
@@ -151,12 +152,13 @@ const Dashboard = (props) => {
 Dashboard.propTypes = {
   status: PropTypes.string.isRequired,
   onFetch: PropTypes.func.isRequired,
+  onSearch: PropTypes.func.isRequired,
   movies: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
       title: PropTypes.string.isRequired,
       overview: PropTypes.string.isRequired,
-      posterPath: PropTypes.string.isRequired
+      posterPath: PropTypes.string
     })
   ),
   page: PropTypes.number,
@@ -171,15 +173,16 @@ Dashboard.defaultProps = {
 
 const mapStateToProps = (state) => {
   const {
-    mode, status, movies, page, totalResults
+    status, movies, page, totalResults
   } = state.dashboard
   return {
-    mode, status, movies, page, totalResults
+    status, movies, page, totalResults
   }
 }
 
 const mapDispatchToProps = dispatch => ({
-  onFetch: page => dispatch(actions.fetch(page))
+  onFetch: page => dispatch(actions.fetch(page)),
+  onSearch: query => dispatch(actions.search(query))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Dashboard)

@@ -11,7 +11,7 @@ import Logout from '../Logout'
 const Overlay = () => (
   <Menu>
     <Menu.Item>
-      <Link to="/stubs/dashboard">Dashboard</Link>
+      <Link to="/dashboard">Dashboard</Link>
     </Menu.Item>
     <Menu.Divider />
     <Menu.Item>

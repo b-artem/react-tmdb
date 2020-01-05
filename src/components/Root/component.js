@@ -1,6 +1,6 @@
 import React from 'react'
 import {
-  Link, Route, BrowserRouter as Router, Switch
+  Link, Route, BrowserRouter as Router, Switch, withRouter
 } from 'react-router-dom'
 
 import PrivateRoute from '../PrivateRoute'
@@ -34,11 +34,11 @@ const Root = () => (
       />
       <PrivateRoute
         path="/"
-        component={Dashboard}
+        component={withRouter(Dashboard)}
       />
       <PrivateRoute
         path="/dashboard"
-        component={Dashboard}
+        component={withRouter(Dashboard)}
       />
       <Route component={Links} />
     </Switch>

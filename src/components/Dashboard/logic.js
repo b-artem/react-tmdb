@@ -1,7 +1,10 @@
 import { createLogic } from 'redux-logic'
 import {
-  DASHBOARD_FETCH, DASHBOARD_FETCH_SUCCESS, DASHBOARD_FETCH_FAIL
+  DASHBOARD_FETCH, DASHBOARD_FETCH_SUCCESS, DASHBOARD_FETCH_FAIL,
+  DASHBOARD_SEARCH, DASHBOARD_SEARCH_VALIDATION_SUCCESS, DASHBOARD_SEARCH_VALIDATION_FAIL
 } from './actions'
+import { modes } from './component'
+
 
 export const fetchLogic = createLogic({
   type: DASHBOARD_FETCH,
@@ -14,15 +17,23 @@ export const fetchLogic = createLogic({
   },
 
   process({ httpClient, getState }) {
-    const { page } = getState().dashboard
+    const { mode, page, query } = getState().dashboard
 
     const params = { api_key: process.env.API_KEY }
     if (page) {
       params.page = page
     }
 
+    let path
+    if (mode === modes.TRENDING) {
+      path = '/trending/movie/day'
+    } else if (mode === modes.SEARCH) {
+      path = '/search/movie'
+      params.query = query
+    }
+
     return httpClient.get(
-      '/trending/movie/day',
+      path,
       { params }
     ).then((resp) => {
       const movies = resp.data.results.map((movie) => {
@@ -46,6 +57,24 @@ export const fetchLogic = createLogic({
   }
 })
 
+export const searchLogic = createLogic({
+  type: DASHBOARD_SEARCH,
+
+  process({ getState }, dispatch, done) {
+    const { query } = getState().dashboard
+
+    if (query.length > 0) {
+      dispatch({ type: DASHBOARD_SEARCH_VALIDATION_SUCCESS })
+      dispatch({ type: DASHBOARD_FETCH, page: 1 })
+      done()
+    } else {
+      dispatch({ type: DASHBOARD_SEARCH_VALIDATION_FAIL })
+      done()
+    }
+  }
+})
+
 export default [
-  fetchLogic
+  fetchLogic,
+  searchLogic
 ]
