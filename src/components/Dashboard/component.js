@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {
-  Layout, Row, Col, Input, Pagination, Empty, Spin
+  Layout, Row, Col, Form, Input, Pagination, Empty, Spin
 } from 'antd'
 
 import Header from '../Header'
@@ -32,7 +32,7 @@ export const statuses = {
 
 const Dashboard = (props) => {
   const {
-    status, onFetch, onSearch, movies, page, totalResults
+    status, onFetch, onSearch, movies, page, totalResults, queryHasError
   } = props
 
   if (status !== LOADED) {
@@ -129,13 +129,20 @@ const Dashboard = (props) => {
             lg={{ span: 16, offset: 4 }}
             xl={{ span: 14, offset: 5 }}
           >
-            <Input.Search
-              placeholder="Enter movie name"
-              size="large"
-              enterButton="Search"
-              className="top-margin"
-              onSearch={query => onSearch(query)}
-            />
+            <Form>
+              <Form.Item
+                validateStatus={queryHasError ? 'error' : ''}
+                help={queryHasError ? "Shouldn't  be empty" : ''}
+              >
+                <Input.Search
+                  placeholder="Enter movie name"
+                  size="large"
+                  enterButton="Search"
+                  className="top-margin"
+                  onSearch={query => onSearch(query)}
+                />
+              </Form.Item>
+            </Form>
           </Col>
         </Row>
         <div className="top-margin">
@@ -162,21 +169,23 @@ Dashboard.propTypes = {
     })
   ),
   page: PropTypes.number,
-  totalResults: PropTypes.number
+  totalResults: PropTypes.number,
+  queryHasError: PropTypes.bool
 }
 
 Dashboard.defaultProps = {
   movies: [],
   page: 1,
-  totalResults: 20
+  totalResults: 20,
+  queryHasError: false
 }
 
 const mapStateToProps = (state) => {
   const {
-    status, movies, page, totalResults
+    status, movies, page, totalResults, queryHasError
   } = state.dashboard
   return {
-    status, movies, page, totalResults
+    status, movies, page, totalResults, queryHasError
   }
 }
 
