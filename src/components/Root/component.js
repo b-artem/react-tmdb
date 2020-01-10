@@ -1,29 +1,16 @@
 import React from 'react'
 import {
-  Link, Route, BrowserRouter as Router, Switch, withRouter
+  Route, BrowserRouter as Router, Switch, withRouter
 } from 'react-router-dom'
 
 import PrivateRoute from '../PrivateRoute'
 import Login from '../Login'
 import Dashboard from '../Dashboard'
-// import DashboardEmpty from '../DashboardEmpty'
-// import DashboardLoading from '../DashboardLoading'
 // import Movie from '../Movie'
 // import Lists from '../Lists'
 // import ListDetails from '../ListDetails'
 // import Watchlist from '../Watchlist'
-// import Favorites from '../Favorites/component'
-
-const Links = () => (
-  <React.Fragment>
-    <div>
-      <Link to="/login">Login</Link>
-    </div>
-    <div>
-      <Link to="/dashboard">Dashboard with content</Link>
-    </div>
-  </React.Fragment>
-)
+import Favorites from '../Favorites/component'
 
 const Root = () => (
   <Router>
@@ -33,6 +20,7 @@ const Root = () => (
         component={Login}
       />
       <PrivateRoute
+        exact
         path="/"
         component={withRouter(Dashboard)}
       />
@@ -40,7 +28,10 @@ const Root = () => (
         path="/dashboard"
         component={withRouter(Dashboard)}
       />
-      <Route component={Links} />
+      <PrivateRoute
+        path="/favorites"
+        component={withRouter(Favorites)}
+      />
     </Switch>
   </Router>
 )

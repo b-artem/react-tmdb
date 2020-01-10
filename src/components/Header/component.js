@@ -21,7 +21,7 @@ const Overlay = () => (
       <Link to="/stubs/watchlist">Watchlist</Link>
     </Menu.Item>
     <Menu.Item>
-      <Link to="/stubs/favorites">Favorites</Link>
+      <Link to="/favorites">Favorites</Link>
     </Menu.Item>
     <Menu.Divider />
     <Logout />

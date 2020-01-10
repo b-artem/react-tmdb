@@ -1,5 +1,7 @@
 import {
-  AUTH_GET_TOKEN, AUTH_VALIDATE_TOKEN, AUTH_CREATE_SESSION, AUTH_STORE_SESSION,
+  AUTH_GET_TOKEN, AUTH_VALIDATE_TOKEN,
+  AUTH_CREATE_SESSION, AUTH_STORE_SESSION,
+  AUTH_GET_ACCOUNT_DETAILS,
   AUTH_SUCCESS, AUTH_FAIL
 } from '../../components/Login/actions'
 import { LOGOUT, LOGOUT_SUCCESS, LOGOUT_FAIL } from '../../components/Logout/actions'
@@ -41,15 +43,24 @@ export default function reducer(state = initialState, action) {
         loading: true
       }
     }
+    case AUTH_GET_ACCOUNT_DETAILS: {
+      return {
+        ...state,
+        loading: true
+      }
+    }
     case AUTH_SUCCESS: {
       return {
         ...state,
         isAuthenticated: true,
-        loading: false
+        loading: false,
+        accountId: action.payload.id
       }
     }
     case AUTH_FAIL: {
-      const { username, ...newState } = state
+      const {
+        username, sessionId, password, requestToken, ...newState
+      } = state
       return {
         ...newState,
         isAuthenticated: false,

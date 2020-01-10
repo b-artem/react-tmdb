@@ -1,7 +1,8 @@
 import { createLogic } from 'redux-logic'
 import {
   AUTH_GET_TOKEN, AUTH_VALIDATE_TOKEN, AUTH_CREATE_SESSION, AUTH_STORE_SESSION,
-  AUTH_SUCCESS, AUTH_FAIL
+  AUTH_SUCCESS, AUTH_FAIL,
+  AUTH_GET_ACCOUNT_DETAILS
 } from '../../components/Login/actions'
 import { LOGOUT, LOGOUT_SUCCESS, LOGOUT_FAIL } from '../../components/Logout/actions'
 
@@ -63,13 +64,31 @@ export const storeSessionLogic = createLogic({
   type: AUTH_STORE_SESSION,
 
   processOptions: {
-    successType: AUTH_SUCCESS,
+    successType: AUTH_GET_ACCOUNT_DETAILS,
     failType: AUTH_FAIL
   },
 
   process({ cookies, getState }) {
     const { sessionId } = getState().auth
     return cookies.set('session_id', sessionId)
+  }
+})
+
+export const getAccountDetailsLogic = createLogic({
+  type: AUTH_GET_ACCOUNT_DETAILS,
+
+  processOptions: {
+    successType: AUTH_SUCCESS,
+    failType: AUTH_FAIL
+  },
+
+  process({ httpClient, getState }) {
+    const { sessionId } = getState().auth
+
+    return httpClient.get(
+      '/account',
+      { params: { api_key: process.env.API_KEY, session_id: sessionId } }
+    ).then(resp => resp.data)
   }
 })
 
@@ -102,5 +121,6 @@ export default [
   validateTokenLogic,
   createSessionLogic,
   storeSessionLogic,
+  getAccountDetailsLogic,
   logoutLogic
 ]

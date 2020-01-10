@@ -22,8 +22,4 @@ const mapDispatchToProps = dispatch => ({
   logout: () => dispatch(actions.logout())
 })
 
-// const mapStateToProps = state => ({
-//   isAuthenticated: state.auth.isAuthenticated
-// })
-
 export default connect(null, mapDispatchToProps)(Logout)
