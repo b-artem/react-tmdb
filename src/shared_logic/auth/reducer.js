@@ -8,15 +8,15 @@ import { LOGOUT, LOGOUT_SUCCESS, LOGOUT_FAIL } from '../../components/Logout/act
 
 const initialState = {
   isAuthenticated: false,
+  invalidCredentials: false,
   loading: false
 }
 
 export default function reducer(state = initialState, action) {
   switch (action.type) {
     case AUTH_GET_TOKEN: {
-      const { errorStatus, ...newState } = state
       return {
-        ...newState,
+        ...state,
         username: action.username,
         password: action.password,
         loading: true
@@ -53,6 +53,7 @@ export default function reducer(state = initialState, action) {
       return {
         ...state,
         isAuthenticated: true,
+        invalidCredentials: false,
         loading: false,
         accountId: action.payload.id
       }
@@ -61,11 +62,12 @@ export default function reducer(state = initialState, action) {
       const {
         username, sessionId, password, requestToken, ...newState
       } = state
+
       return {
         ...newState,
         isAuthenticated: false,
         loading: false,
-        errorStatus: `Authentication error: ${action.payload.status}`
+        invalidCredentials: true
       }
     }
     case LOGOUT:

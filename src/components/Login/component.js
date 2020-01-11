@@ -70,9 +70,23 @@ class Login extends React.Component {
     onAuth(username, password)
   }
 
+  passwordError() {
+    const { passwordHasError } = this.state
+    const { invalidCredentials } = this.props
+
+    let message = ''
+    if (passwordHasError) {
+      message = 'Password must contain at least 4 symbols'
+    } else if (invalidCredentials) {
+      message = 'Invalid username or password'
+    }
+
+    return message
+  }
+
   render() {
     const {
-      loading, isAuthenticated, location
+      loading, isAuthenticated, location, invalidCredentials
     } = this.props
     const {
       username, usernameHasError, passwordHasError
@@ -111,8 +125,8 @@ class Login extends React.Component {
                     />
                   </Form.Item>
                   <Form.Item
-                    validateStatus={passwordHasError ? 'error' : ''}
-                    help={passwordHasError ? 'Password must contain at least 4 symbols' : ''}
+                    validateStatus={passwordHasError || invalidCredentials ? 'error' : ''}
+                    help={this.passwordError()}
                   >
                     <Input
                       prefix={(
@@ -149,6 +163,7 @@ class Login extends React.Component {
 Login.propTypes = {
   onAuth: PropTypes.func.isRequired,
   isAuthenticated: PropTypes.bool.isRequired,
+  invalidCredentials: PropTypes.bool.isRequired,
   loading: PropTypes.bool,
   location: PropTypes.shape({
     pathname: PropTypes.string
@@ -160,8 +175,8 @@ Login.defaultProps = {
 }
 
 const mapStateToProps = (state) => {
-  const { loading, isAuthenticated } = state.auth
-  return { loading, isAuthenticated }
+  const { loading, isAuthenticated, invalidCredentials } = state.auth
+  return { loading, isAuthenticated, invalidCredentials }
 }
 
 const mapDispatchToProps = dispatch => ({
