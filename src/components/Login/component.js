@@ -109,7 +109,7 @@ class Login extends React.Component {
                 <Form onSubmit={this.submitHandler}>
                   <Typography.Title>The Movie DB</Typography.Title>
                   <Form.Item
-                    validateStatus={usernameHasError ? 'error' : ''}
+                    validateStatus={usernameHasError || invalidCredentials ? 'error' : ''}
                     help={usernameHasError ? 'Should be combination of numbers & alphabets' : ''}
                   >
                     <Input

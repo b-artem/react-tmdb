@@ -13,6 +13,7 @@ export default function reducer(state = initialState, action) {
     case MOVIE_LIST_FETCH: {
       return {
         ...state,
+        listType: action.listType,
         page: action.page
       }
     }
@@ -36,6 +37,7 @@ export default function reducer(state = initialState, action) {
     case MOVIE_LIST_DELETE: {
       return {
         ...state,
+        listType: action.listType,
         id: action.id
       }
     }

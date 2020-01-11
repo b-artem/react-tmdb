@@ -18,7 +18,7 @@ const Overlay = () => (
       <Link to="/stubs/lists">My Lists</Link>
     </Menu.Item>
     <Menu.Item>
-      <Link to="/stubs/watchlist">Watchlist</Link>
+      <Link to="/watchlist">Watchlist</Link>
     </Menu.Item>
     <Menu.Item>
       <Link to="/favorites">Favorites</Link>

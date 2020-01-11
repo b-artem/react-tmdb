@@ -27,21 +27,21 @@ export const statuses = {
   EMPTY
 }
 
-const showDeleteMovieModal = (listType, onDelete, id) => {
+const showDeleteMovieModal = (onDelete, listType, id) => {
   Modal.confirm({
     title: `Do you want to delete movie from ${listType.toLowerCase()}?`,
-    onOk() { onDelete(id) },
+    onOk() { onDelete(listType, id) },
     onCancel() {}
   })
 }
 
 const Favorites = (props) => {
   const {
-    listType, status, onFetch, onDelete, movies, page, totalResults
+    listType, previousListType, status, onFetch, onDelete, movies, page, totalResults
   } = props
 
-  if (status !== LOADED) {
-    onFetch(page)
+  if (status !== LOADED || previousListType !== listType) {
+    onFetch(listType, page)
   }
 
   let content
@@ -74,7 +74,7 @@ const Favorites = (props) => {
                   actions={[<Icon
                     key="delete"
                     type="delete"
-                    onClick={() => showDeleteMovieModal(listType, onDelete, item.id)}
+                    onClick={() => showDeleteMovieModal(onDelete, listType, item.id)}
                   />]}
                 />
               </Col>
@@ -120,7 +120,7 @@ const Favorites = (props) => {
           total={totalResults}
           className="pagination"
           disabled={status !== LOADED}
-          onChange={newPage => onFetch(newPage)}
+          onChange={newPage => onFetch(listType, newPage)}
         />
       </Col>
     </Row>
@@ -150,7 +150,8 @@ const Favorites = (props) => {
 }
 
 Favorites.propTypes = {
-  listType: PropTypes.string.isRequired,
+  listType: PropTypes.oneOf(Object.values(listTypes)).isRequired,
+  previousListType: PropTypes.oneOf(Object.values(listTypes)),
   status: PropTypes.string.isRequired,
   onFetch: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
@@ -167,6 +168,7 @@ Favorites.propTypes = {
 }
 
 Favorites.defaultProps = {
+  previousListType: null,
   movies: [],
   page: 1,
   totalResults: 20
@@ -174,16 +176,16 @@ Favorites.defaultProps = {
 
 const mapStateToProps = (state) => {
   const {
-    status, movies, page, totalResults
+    previousListType, status, movies, page, totalResults
   } = state.movieList
   return {
-    status, movies, page, totalResults
+    previousListType, status, movies, page, totalResults
   }
 }
 
 const mapDispatchToProps = dispatch => ({
-  onFetch: page => dispatch(actions.fetch(page)),
-  onDelete: id => dispatch(actions.deleteMovie(id))
+  onFetch: (listType, page) => dispatch(actions.fetch(listType, page)),
+  onDelete: (listType, id) => dispatch(actions.deleteMovie(listType, id))
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Favorites)

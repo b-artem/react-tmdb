@@ -9,7 +9,7 @@ import Dashboard from '../Dashboard'
 // import Movie from '../Movie'
 // import Lists from '../Lists'
 // import ListDetails from '../ListDetails'
-// import Watchlist from '../Watchlist'
+import Watchlist from '../Watchlist'
 import Favorites from '../Favorites'
 
 const Root = () => (
@@ -27,6 +27,10 @@ const Root = () => (
       <PrivateRoute
         path="/dashboard"
         component={withRouter(Dashboard)}
+      />
+      <PrivateRoute
+        path="/watchlist"
+        component={withRouter(Watchlist)}
       />
       <PrivateRoute
         path="/favorites"

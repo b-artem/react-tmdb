@@ -17,13 +17,15 @@ export const actionTypes = {
   MOVIE_LIST_DELETE_FAIL
 }
 
-export const fetch = page => ({
+export const fetch = (listType, page) => ({
   type: MOVIE_LIST_FETCH,
+  listType,
   page
 })
 
-export const deleteMovie = id => ({
+export const deleteMovie = (listType, id) => ({
   type: MOVIE_LIST_DELETE,
+  listType,
   id
 })
 

@@ -1,4 +1,6 @@
 import { createLogic } from 'redux-logic'
+
+import { listTypes } from './component'
 import {
   MOVIE_LIST_FETCH, MOVIE_LIST_FETCH_SUCCESS, MOVIE_LIST_FETCH_FAIL,
   MOVIE_LIST_DELETE, MOVIE_LIST_DELETE_SUCCESS, MOVIE_LIST_DELETE_FAIL
@@ -16,17 +18,18 @@ export const fetchLogic = createLogic({
 
   process({ httpClient, getState }) {
     const { accountId, sessionId } = getState().auth
-    const { page } = getState().movieList
+    const { listType, page } = getState().movieList
+
+    const path = listType === listTypes.FAVORITES
+      ? `/account/${accountId}/favorite/movies`
+      : `/account/${accountId}/watchlist/movies`
 
     const params = { api_key: process.env.API_KEY, session_id: sessionId }
     if (page) {
       params.page = page
     }
 
-    return httpClient.get(
-      `/account/${accountId}/favorite/movies`,
-      { params }
-    ).then((resp) => {
+    return httpClient.get(path, { params }).then((resp) => {
       const movies = resp.data.results.map((movie) => {
         const {
           id, title, overview, poster_path: posterPath
@@ -60,15 +63,22 @@ export const deleteLogic = createLogic({
 
   process({ httpClient, getState }) {
     const { accountId, sessionId } = getState().auth
-    const { movies, id } = getState().movieList
+    const { listType, movies, id } = getState().movieList
+
+    const path = listType === listTypes.FAVORITES
+      ? `/account/${accountId}/favorite`
+      : `/account/${accountId}/watchlist`
 
     const params = { api_key: process.env.API_KEY, session_id: sessionId }
 
-    return httpClient.post(
-      `/account/${accountId}/favorite`,
-      { media_type: 'movie', media_id: id, favorite: false },
-      { params }
-    ).then(() => {
+    const body = { media_type: 'movie', media_id: id }
+    if (listType === listTypes.FAVORITES) {
+      body.favorite = false
+    } else {
+      body.watchlist = false
+    }
+
+    return httpClient.post(path, body, { params }).then(() => {
       const newMovies = movies.filter(movie => movie.id !== id)
       return { movies: newMovies }
     })
