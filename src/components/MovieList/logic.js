@@ -1,22 +1,22 @@
 import { createLogic } from 'redux-logic'
 import {
-  FAVORITES_FETCH, FAVORITES_FETCH_SUCCESS, FAVORITES_FETCH_FAIL,
-  FAVORITES_DELETE, FAVORITES_DELETE_SUCCESS, FAVORITES_DELETE_FAIL
+  MOVIE_LIST_FETCH, MOVIE_LIST_FETCH_SUCCESS, MOVIE_LIST_FETCH_FAIL,
+  MOVIE_LIST_DELETE, MOVIE_LIST_DELETE_SUCCESS, MOVIE_LIST_DELETE_FAIL
 } from './actions'
 
 export const fetchLogic = createLogic({
-  type: FAVORITES_FETCH,
+  type: MOVIE_LIST_FETCH,
 
   throttle: 1000,
 
   processOptions: {
-    successType: FAVORITES_FETCH_SUCCESS,
-    failType: FAVORITES_FETCH_FAIL
+    successType: MOVIE_LIST_FETCH_SUCCESS,
+    failType: MOVIE_LIST_FETCH_FAIL
   },
 
   process({ httpClient, getState }) {
     const { accountId, sessionId } = getState().auth
-    const { page } = getState().favorites
+    const { page } = getState().movieList
 
     const params = { api_key: process.env.API_KEY, session_id: sessionId }
     if (page) {
@@ -49,18 +49,18 @@ export const fetchLogic = createLogic({
 })
 
 export const deleteLogic = createLogic({
-  type: FAVORITES_DELETE,
+  type: MOVIE_LIST_DELETE,
 
   throttle: 1000,
 
   processOptions: {
-    successType: FAVORITES_DELETE_SUCCESS,
-    failType: FAVORITES_DELETE_FAIL
+    successType: MOVIE_LIST_DELETE_SUCCESS,
+    failType: MOVIE_LIST_DELETE_FAIL
   },
 
   process({ httpClient, getState }) {
     const { accountId, sessionId } = getState().auth
-    const { movies, id } = getState().favorites
+    const { movies, id } = getState().movieList
 
     const params = { api_key: process.env.API_KEY, session_id: sessionId }
 

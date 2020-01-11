@@ -10,7 +10,7 @@ import Dashboard from '../Dashboard'
 // import Lists from '../Lists'
 // import ListDetails from '../ListDetails'
 // import Watchlist from '../Watchlist'
-import Favorites from '../Favorites/component'
+import Favorites from '../Favorites'
 
 const Root = () => (
   <Router>

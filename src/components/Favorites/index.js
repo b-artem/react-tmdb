@@ -1,3 +1,3 @@
-import ListDetails from './component'
+import Favorites from './component'
 
-export default ListDetails
+export default Favorites
