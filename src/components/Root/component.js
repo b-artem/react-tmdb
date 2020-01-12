@@ -7,7 +7,7 @@ import PrivateRoute from '../PrivateRoute'
 import Login from '../Login'
 import Dashboard from '../Dashboard'
 // import Movie from '../Movie'
-// import Lists from '../Lists'
+import Lists from '../Lists'
 // import ListDetails from '../ListDetails'
 import Watchlist from '../Watchlist'
 import Favorites from '../Favorites'
@@ -27,6 +27,10 @@ const Root = () => (
       <PrivateRoute
         path="/dashboard"
         component={withRouter(Dashboard)}
+      />
+      <PrivateRoute
+        path="/lists"
+        component={withRouter(Lists)}
       />
       <PrivateRoute
         path="/watchlist"

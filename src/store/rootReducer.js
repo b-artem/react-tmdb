@@ -6,11 +6,15 @@ import authReducer from '../shared_logic/auth/reducer'
 import { key as dashboardKey } from '../components/Dashboard/actions'
 import dashboardReducer from '../components/Dashboard/reducer'
 
+import { key as listsKey } from '../components/Lists/actions'
+import listsReducer from '../components/Lists/reducer'
+
 import { key as movieListKey } from '../components/MovieList/actions'
 import movieListReducer from '../components/MovieList/reducer'
 
 export default combineReducers({
   [authKey]: authReducer,
   [dashboardKey]: dashboardReducer,
+  [listsKey]: listsReducer,
   [movieListKey]: movieListReducer
 })

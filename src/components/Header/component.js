@@ -15,7 +15,7 @@ const Overlay = () => (
     </Menu.Item>
     <Menu.Divider />
     <Menu.Item>
-      <Link to="/stubs/lists">My Lists</Link>
+      <Link to="/lists">My Lists</Link>
     </Menu.Item>
     <Menu.Item>
       <Link to="/watchlist">Watchlist</Link>

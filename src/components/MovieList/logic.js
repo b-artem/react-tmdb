@@ -25,9 +25,7 @@ export const fetchLogic = createLogic({
       : `/account/${accountId}/watchlist/movies`
 
     const params = { api_key: process.env.API_KEY, session_id: sessionId }
-    if (page) {
-      params.page = page
-    }
+    if (page) { params.page = page }
 
     return httpClient.get(path, { params }).then((resp) => {
       const movies = resp.data.results.map((movie) => {

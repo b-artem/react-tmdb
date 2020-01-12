@@ -136,7 +136,9 @@ const Favorites = (props) => {
             span={20}
           >
             <div className="top-margin">
-              <Typography.Title>Favorites</Typography.Title>
+              <Typography.Title>
+                {listType === FAVORITES ? 'Favorites' : 'Watchlist'}
+              </Typography.Title>
             </div>
           </Col>
         </Row>
