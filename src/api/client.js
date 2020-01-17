@@ -11,6 +11,9 @@ const client = axios.create({
 client.interceptors.request.use((config) => {
   const newConfig = config
 
+  const params = newConfig.params || {}
+  newConfig.params = { ...params, api_key: process.env.API_KEY }
+
   const token = Cookies.get('auth_token')
   if (token) {
     newConfig.headers = { Authorization: `Bearer ${token}` }

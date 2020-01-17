@@ -20,7 +20,7 @@ export const fetchLogic = createLogic({
     const { accountId, sessionId } = getState().auth
     const { page } = getState().lists
 
-    const params = { api_key: process.env.API_KEY, session_id: sessionId }
+    const params = { session_id: sessionId }
     if (page) { params.page = page }
 
     return httpClient.get(`/account/${accountId}/lists`, { params }).then((resp) => {
@@ -59,7 +59,7 @@ export const createListLogic = createLogic({
     const { name, description, lists } = getState().lists
 
     const body = { name, description }
-    const params = { api_key: process.env.API_KEY, session_id: sessionId }
+    const params = { session_id: sessionId }
 
     return httpClient.post('/list', body, { params }).then((resp) => {
       const id = resp.data.list_id
@@ -84,7 +84,7 @@ export const deleteLogic = createLogic({
     const { sessionId } = getState().auth
     const { lists, id } = getState().lists
 
-    const params = { api_key: process.env.API_KEY, session_id: sessionId }
+    const params = { session_id: sessionId }
 
     return httpClient.delete(`/list/${id}`, { params }).then(() => {
       const newLists = lists.filter(list => list.id !== id)

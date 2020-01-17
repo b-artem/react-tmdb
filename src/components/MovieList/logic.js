@@ -24,7 +24,7 @@ export const fetchLogic = createLogic({
       ? `/account/${accountId}/favorite/movies`
       : `/account/${accountId}/watchlist/movies`
 
-    const params = { api_key: process.env.API_KEY, session_id: sessionId }
+    const params = { session_id: sessionId }
     if (page) { params.page = page }
 
     return httpClient.get(path, { params }).then((resp) => {
@@ -67,7 +67,7 @@ export const deleteLogic = createLogic({
       ? `/account/${accountId}/favorite`
       : `/account/${accountId}/watchlist`
 
-    const params = { api_key: process.env.API_KEY, session_id: sessionId }
+    const params = { session_id: sessionId }
 
     const body = { media_type: 'movie', media_id: id }
     if (listType === listTypes.FAVORITES) {

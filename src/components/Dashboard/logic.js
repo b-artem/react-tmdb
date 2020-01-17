@@ -19,7 +19,7 @@ export const fetchLogic = createLogic({
   process({ httpClient, getState }) {
     const { mode, page, query } = getState().dashboard
 
-    const params = { api_key: process.env.API_KEY }
+    const params = {}
     if (page) {
       params.page = page
     }

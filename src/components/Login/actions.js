@@ -8,16 +8,6 @@ export const AUTH_GET_ACCOUNT_DETAILS = 'AUTH_GET_ACCOUNT_DETAILS'
 export const AUTH_SUCCESS = 'AUTH_SUCCESS'
 export const AUTH_FAIL = 'AUTH_FAIL'
 
-export const actionTypes = {
-  AUTH_GET_TOKEN,
-  AUTH_VALIDATE_TOKEN,
-  AUTH_CREATE_SESSION,
-  AUTH_STORE_SESSION,
-  AUTH_GET_ACCOUNT_DETAILS,
-  AUTH_SUCCESS,
-  AUTH_FAIL
-}
-
 export const auth = (username, password) => ({
   type: AUTH_GET_TOKEN,
   username,

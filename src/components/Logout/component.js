@@ -5,21 +5,21 @@ import { Menu } from 'antd'
 
 import { actions } from './actions'
 
-const Logout = ({ logout, ...rest }) => (
+const Logout = ({ onLogout, ...rest }) => (
   <Menu.Item
     {...rest}
-    onClick={logout}
+    onClick={onLogout}
   >
     Logout
   </Menu.Item>
 )
 
 Logout.propTypes = {
-  logout: PropTypes.func.isRequired
+  onLogout: PropTypes.func.isRequired
 }
 
 const mapDispatchToProps = dispatch => ({
-  logout: () => dispatch(actions.logout())
+  onLogout: () => dispatch(actions.logout())
 })
 
 export default connect(null, mapDispatchToProps)(Logout)

@@ -26,11 +26,15 @@ const MovieItem = ({ actions, ...props }) => {
 }
 
 MovieItem.propTypes = {
-  actions: PropTypes.arrayOf(PropTypes.node)
+  actions: PropTypes.arrayOf(PropTypes.node),
+  title: PropTypes.string.isRequired,
+  overview: PropTypes.string.isRequired,
+  posterPath: PropTypes.string
 }
 
 MovieItem.defaultProps = {
-  actions: []
+  actions: [],
+  posterPath: null
 }
 
 export default MovieItem

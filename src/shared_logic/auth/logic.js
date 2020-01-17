@@ -15,10 +15,7 @@ export const getTokenLogic = createLogic({
   },
 
   process({ httpClient }) {
-    return httpClient.get(
-      '/authentication/token/new',
-      { params: { api_key: process.env.API_KEY } }
-    ).then(resp => resp.data)
+    return httpClient.get('/authentication/token/new').then(resp => resp.data)
   }
 })
 
@@ -35,8 +32,7 @@ export const validateTokenLogic = createLogic({
 
     return httpClient.post(
       '/authentication/token/validate_with_login',
-      { username, password, request_token: requestToken },
-      { params: { api_key: process.env.API_KEY } }
+      { username, password, request_token: requestToken }
     ).then(resp => resp.data)
   }
 })
@@ -87,7 +83,7 @@ export const getAccountDetailsLogic = createLogic({
 
     return httpClient.get(
       '/account',
-      { params: { api_key: process.env.API_KEY, session_id: sessionId } }
+      { params: { session_id: sessionId } }
     ).then(resp => resp.data)
   }
 })
@@ -106,8 +102,7 @@ export const logoutLogic = createLogic({
     return httpClient.delete(
       '/authentication/session',
       {
-        data: { session_id: sessionId },
-        params: { api_key: process.env.API_KEY }
+        data: { session_id: sessionId }
       }
     ).then((resp) => {
       cookies.remove('session_id')
