@@ -20,6 +20,7 @@ export default function reducer(state = initialState, action) {
     case MOVIE_LIST_FETCH_SUCCESS:
       return {
         ...state,
+        previousListType: action.payload.previousListType,
         status: action.payload.movies.length ? statuses.LOADED : statuses.EMPTY,
         movies: action.payload.movies,
         page: action.payload.page,
@@ -27,7 +28,7 @@ export default function reducer(state = initialState, action) {
       }
     case MOVIE_LIST_FETCH_FAIL: {
       const {
-        movies, page, totalResults, ...newState
+        previousListType, movies, page, totalResults, ...newState
       } = state
       return {
         ...newState,

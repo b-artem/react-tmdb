@@ -27,6 +27,8 @@ export const statuses = {
   EMPTY
 }
 
+const moviesPerPage = 20
+
 const showDeleteMovieModal = (onDelete, listType, id) => {
   Modal.confirm({
     title: `Do you want to delete movie from ${listType.toLowerCase()}?`,
@@ -116,7 +118,7 @@ const Favorites = (props) => {
         <Pagination
           defaultCurrent={1}
           current={page}
-          pageSize={20}
+          pageSize={moviesPerPage}
           total={totalResults}
           className="pagination"
           disabled={status !== LOADED}
@@ -154,7 +156,7 @@ const Favorites = (props) => {
 Favorites.propTypes = {
   listType: PropTypes.oneOf(Object.values(listTypes)).isRequired,
   previousListType: PropTypes.oneOf(Object.values(listTypes)),
-  status: PropTypes.string.isRequired,
+  status: PropTypes.oneOf(Object.values(statuses)).isRequired,
   onFetch: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   movies: PropTypes.arrayOf(
@@ -173,7 +175,7 @@ Favorites.defaultProps = {
   previousListType: null,
   movies: [],
   page: 1,
-  totalResults: 20
+  totalResults: moviesPerPage
 }
 
 const mapStateToProps = (state) => {

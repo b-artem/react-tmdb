@@ -89,6 +89,10 @@ export const deleteLogic = createLogic({
     return httpClient.delete(`/list/${id}`, { params }).then(() => {
       const newLists = lists.filter(list => list.id !== id)
       return { lists: newLists }
+    }).catch(() => {
+      // At the moment of writing, API returns status 500, although it deletes a list
+      const newLists = lists.filter(list => list.id !== id)
+      return { lists: newLists }
     })
   }
 })

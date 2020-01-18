@@ -9,6 +9,9 @@ import dashboardReducer from '../components/Dashboard/reducer'
 import { key as listsKey } from '../components/Lists/actions'
 import listsReducer from '../components/Lists/reducer'
 
+import { key as listDetailsKey } from '../components/ListDetails/actions'
+import listDetailsReducer from '../components/ListDetails/reducer'
+
 import { key as movieListKey } from '../components/MovieList/actions'
 import movieListReducer from '../components/MovieList/reducer'
 
@@ -16,5 +19,6 @@ export default combineReducers({
   [authKey]: authReducer,
   [dashboardKey]: dashboardReducer,
   [listsKey]: listsReducer,
+  [listDetailsKey]: listDetailsReducer,
   [movieListKey]: movieListReducer
 })

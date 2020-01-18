@@ -41,6 +41,7 @@ export const fetchLogic = createLogic({
       })
 
       return {
+        previousListType: listType,
         movies,
         page: resp.data.page,
         totalResults: resp.data.total_results

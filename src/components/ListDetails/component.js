@@ -2,12 +2,12 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import {
-  Layout, Row, Col, Card, Typography, Modal, Icon, Pagination, Spin, Empty
+  Layout, Row, Col, Typography, Modal, Icon, Pagination, Empty, Spin
 } from 'antd'
-import { Link } from 'react-router-dom'
 
 import Header from '../Header'
 import CreateListModal from '../CreateListModal'
+import MovieItem from '../MovieItem'
 import { actions } from './actions'
 
 const LOADED = 'LOADED'
@@ -20,17 +20,27 @@ export const statuses = {
   EMPTY
 }
 
-const showDeleteModal = (event, onDelete, id) => {
+export const moviesPerPage = 20
+
+const showDeleteMovieModal = (event, onDeleteMovie, listId, movieId) => {
   event.preventDefault()
 
   Modal.confirm({
-    title: 'Do you want to delete list?',
-    onOk() { onDelete(id) },
+    title: 'Do you want to delete movie from this list?',
+    onOk() { onDeleteMovie(listId, movieId) },
     onCancel() {}
   })
 }
 
-class Lists extends React.Component {
+const showDeleteListModal = (onDeleteList, id, redirectCallback) => {
+  Modal.confirm({
+    title: 'Do you want to delete list?',
+    onOk() { onDeleteList(id, redirectCallback) },
+    onCancel() {}
+  })
+}
+
+class ListDetails extends React.Component {
   constructor(props) {
     super(props)
 
@@ -44,36 +54,22 @@ class Lists extends React.Component {
       this.setState({ modalVisible: false })
     }
 
-    this.saveFormRef = (formRef) => {
-      this.formRef = formRef
-    }
-
-    this.handleCreate = () => {
-      const { form } = this.formRef.props
-
-      form.validateFields((err, values) => {
-        if (err) return
-
-        const { onCreate } = this.props
-        const { name, description } = values
-
-        onCreate(name, description)
-
-        form.resetFields()
-        this.setState({ modalVisible: false })
-      })
+    this.redirectToLists = () => {
+      const { history } = this.props
+      history.push('/lists', { doReload: true })
     }
   }
 
   render() {
     const {
-      status, lists, page, totalResults, onFetch, onDelete, location
+      previousId, name, status, movies, page, totalResults,
+      onFetch, onDeleteList, onDeleteMovie, location
     } = this.props
-    const doReload = location.state && location.state.doReload
+    const { id } = location.state
     const { modalVisible } = this.state
 
-    if (status !== LOADED || doReload) {
-      onFetch(page)
+    if (status !== LOADED || previousId !== id) {
+      onFetch(id, page)
     }
 
     let content
@@ -89,36 +85,26 @@ class Lists extends React.Component {
               span={20}
               offset={2}
             >
-              {lists.map(item => (
+              {movies.map(item => (
                 <Col
                   key={item.id}
                   xs={{ span: 12 }}
-                  sm={{ span: 8 }}
-                  md={{ span: 6 }}
-                  lg={{ span: 4 }}
+                  sm={{ span: 12 }}
+                  md={{ span: 8 }}
+                  lg={{ span: 6 }}
                   xl={{ span: 4 }}
                 >
-                  <Link
-                    to={{
-                      pathname: '/list/details',
-                      state: { id: item.id }
-                    }}
-                  >
-                    <Card
-                      hoverable
-                      className="top-margin"
-                      actions={[<Icon
-                        key="delete"
-                        type="delete"
-                        onClick={event => showDeleteModal(event, onDelete, item.id)}
-                      />]}
-                    >
-                      <Typography.Title level={4}>
-                        {item.name}
-                      </Typography.Title>
-                      {item.description}
-                    </Card>
-                  </Link>
+                  <MovieItem
+                    key={item.id}
+                    title={item.title}
+                    overview={item.overview}
+                    posterPath={item.posterPath}
+                    actions={[<Icon
+                      key="delete"
+                      type="delete"
+                      onClick={event => showDeleteMovieModal(event, onDeleteMovie, id, item.id)}
+                    />]}
+                  />
                 </Col>
               ))}
             </Col>
@@ -140,7 +126,7 @@ class Lists extends React.Component {
       case EMPTY:
         content = (
           <Empty
-            description="No lists found"
+            description="No movies found"
             image={Empty.PRESENTED_IMAGE_SIMPLE}
           />
         )
@@ -158,11 +144,11 @@ class Lists extends React.Component {
           <Pagination
             defaultCurrent={1}
             current={page}
-            pageSize={20}
+            pageSize={moviesPerPage}
             total={totalResults}
             className="pagination"
             disabled={status !== LOADED}
-            onChange={newPage => onFetch(newPage)}
+            onChange={newPage => onFetch(id, newPage)}
           />
         </Col>
       </Row>
@@ -179,11 +165,11 @@ class Lists extends React.Component {
             >
               <div className="top-margin">
                 <Typography.Title>
-                  My Lists
+                  {name}
                   {' '}
                   <Icon
-                    type="plus-circle"
-                    onClick={this.showModal}
+                    type="minus-circle"
+                    onClick={() => showDeleteListModal(onDeleteList, id, this.redirectToLists)}
                   />
                 </Typography.Title>
               </div>
@@ -194,58 +180,67 @@ class Lists extends React.Component {
           {pagination}
 
         </Layout.Content>
-
-        <CreateListModal
-          wrappedComponentRef={this.saveFormRef}
+        <Modal
           visible={modalVisible}
           onCancel={this.hideModal}
-          onOk={this.handleCreate}
-        />
+          okText="Create"
+          title="Create list"
+        >
+          <CreateListModal />
+        </Modal>
       </Layout>
     )
   }
 }
 
-Lists.propTypes = {
+ListDetails.propTypes = {
+  previousId: PropTypes.number,
   status: PropTypes.oneOf(Object.values(statuses)).isRequired,
+  name: PropTypes.string,
   onFetch: PropTypes.func.isRequired,
-  onCreate: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired,
-  lists: PropTypes.arrayOf(
+  onDeleteList: PropTypes.func.isRequired,
+  onDeleteMovie: PropTypes.func.isRequired,
+  movies: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.number.isRequired,
-      name: PropTypes.string.isRequired,
-      description: PropTypes.string.isRequired
+      title: PropTypes.string.isRequired,
+      overview: PropTypes.string.isRequired,
+      posterPath: PropTypes.string.isRequired
     })
   ),
   page: PropTypes.number,
   totalResults: PropTypes.number,
   location: PropTypes.shape({
     state: PropTypes.shape({
-      doReload: PropTypes.bool
+      id: PropTypes.number.isRequired
     })
+  }).isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func.isRequired
   }).isRequired
 }
 
-Lists.defaultProps = {
-  lists: [],
+ListDetails.defaultProps = {
+  previousId: null,
+  name: null,
+  movies: [],
   page: 1,
-  totalResults: 20
+  totalResults: moviesPerPage
 }
 
 const mapStateToProps = (state) => {
   const {
-    status, lists, page, totalResults
-  } = state.lists
+    previousId, name, status, movies, page, totalResults
+  } = state.listDetails
   return {
-    status, lists, page, totalResults
+    previousId, name, status, movies, page, totalResults
   }
 }
 
 const mapDispatchToProps = dispatch => ({
-  onFetch: page => dispatch(actions.fetch(page)),
-  onCreate: (name, description) => dispatch(actions.create(name, description)),
-  onDelete: id => dispatch(actions.deleteList(id))
+  onFetch: (id, page) => dispatch(actions.fetch(id, page)),
+  onDeleteList: (id, redirectCallback) => dispatch(actions.deleteList(id, redirectCallback)),
+  onDeleteMovie: (listId, movieId) => dispatch(actions.deleteMovie(listId, movieId))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Lists)
+export default connect(mapStateToProps, mapDispatchToProps)(ListDetails)

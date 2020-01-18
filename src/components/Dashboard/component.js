@@ -157,7 +157,7 @@ const Dashboard = (props) => {
 }
 
 Dashboard.propTypes = {
-  status: PropTypes.string.isRequired,
+  status: PropTypes.oneOf(Object.values(statuses)).isRequired,
   onFetch: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
   movies: PropTypes.arrayOf(
