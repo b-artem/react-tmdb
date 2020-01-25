@@ -6,7 +6,8 @@ import {
 import PrivateRoute from '../PrivateRoute'
 import Login from '../Login'
 import Dashboard from '../Dashboard'
-// import Movie from '../Movie'
+import Movie from '../Movie'
+import MovieStub from '../stubs/Movie'
 import Lists from '../Lists'
 import ListDetails from '../ListDetails'
 import Watchlist from '../Watchlist'
@@ -27,6 +28,14 @@ const Root = () => (
       <PrivateRoute
         path="/dashboard"
         component={withRouter(Dashboard)}
+      />
+      <PrivateRoute
+        path="/movie"
+        component={withRouter(Movie)}
+      />
+      <PrivateRoute
+        path="/stubs/movie"
+        component={withRouter(MovieStub)}
       />
       <PrivateRoute
         path="/lists"

@@ -29,7 +29,9 @@ export const statuses = {
 
 const moviesPerPage = 20
 
-const showDeleteMovieModal = (onDelete, listType, id) => {
+const showDeleteMovieModal = (event, onDelete, listType, id) => {
+  event.preventDefault()
+
   Modal.confirm({
     title: `Do you want to delete movie from ${listType.toLowerCase()}?`,
     onOk() { onDelete(listType, id) },
@@ -70,13 +72,14 @@ const Favorites = (props) => {
               >
                 <MovieItem
                   key={item.id}
+                  id={item.id}
                   title={item.title}
                   overview={item.overview}
                   posterPath={item.posterPath}
                   actions={[<Icon
                     key="delete"
                     type="delete"
-                    onClick={() => showDeleteMovieModal(onDelete, listType, item.id)}
+                    onClick={event => showDeleteMovieModal(event, onDelete, listType, item.id)}
                   />]}
                 />
               </Col>

@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import {
   Layout,
   Row,
@@ -13,10 +14,20 @@ import {
   Button,
   Modal
 } from 'antd'
-import { range } from 'lodash'
 
 import Header from '../Header'
 import CreateListModal from '../CreateListModal'
+import { actions } from './actions'
+
+const LOADED = 'LOADED'
+const LOADING = 'LOADING'
+const EMPTY = 'EMPTY'
+
+export const statuses = {
+  LOADED,
+  LOADING,
+  EMPTY
+}
 
 const PopoverContent = ({ openModal, closePopover }) => (
   <React.Fragment>
@@ -84,6 +95,16 @@ class Movie extends React.Component {
     const {
       modalVisible, popoverVisible, bookmarked, watchlist
     } = this.state
+    const {
+      previousId, status, title, year, overview, originalLanguage, runtime, budget,
+      revenue, genres, credits, backdrops, onFetch, location
+    } = this.props
+    const { id } = location.state
+
+    if (status !== LOADED || previousId !== id) {
+      onFetch(id)
+    }
+
     return (
       <Layout>
         <Header />
@@ -91,27 +112,15 @@ class Movie extends React.Component {
           <Row type="flex">
             <Col span={24}>
               <Carousel autoplay>
-                <div>
-                  <img
-                    className="movie-image"
-                    src="https://image.tmdb.org/t/p/original/7RyHsO4yDXtBv1zUU3mTpHeQ0d5.jpg"
-                    alt=""
-                  />
-                </div>
-                <div>
-                  <img
-                    className="movie-image"
-                    src="https://image.tmdb.org/t/p/original/orjiB3oUIsyz60hoEqkiGpy5CeO.jpg"
-                    alt=""
-                  />
-                </div>
-                <div>
-                  <img
-                    className="movie-image"
-                    src="https://image.tmdb.org/t/p/original/wMFad1v8SwyVvrKXmsIkLhSxCEC.jpg"
-                    alt=""
-                  />
-                </div>
+                {backdrops.map(backdrop => (
+                  <div key={backdrop.file_path}>
+                    <img
+                      className="movie-image"
+                      src={`https://image.tmdb.org/t/p/original${backdrop.file_path}`}
+                      alt=""
+                    />
+                  </div>
+                ))}
               </Carousel>
             </Col>
           </Row>
@@ -122,7 +131,7 @@ class Movie extends React.Component {
                 offset={2}
               >
                 <Typography.Title>
-                  <span>Avengers: Endgame (2019)</span>
+                  <span>{`${title} (${year})`}</span>
                   {' '}
                   <Popover
                     title="Add movie to list"
@@ -134,7 +143,7 @@ class Movie extends React.Component {
                         openModal={this.showModal}
                         closePopover={() => this.handleVisiblePopover(false)}
                       />
-)}
+                    )}
                   >
                     <Icon type="plus-circle" />
                   </Popover>
@@ -153,11 +162,7 @@ class Movie extends React.Component {
                 </Typography.Title>
                 <Typography.Title level={3}>Overview</Typography.Title>
                 <Typography.Paragraph>
-                  After the devastating events of Avengers: Infinity War, the universe is in ruins
-                  due to the efforts of the Mad Titan, Thanos. With the help of remaining allies,
-                  the Avengers must assemble once more in order to undo Thanos&apos; actions and
-                  restore order to the universe once and for all, no matter what consequences may be
-                  in store.
+                  {overview}
                 </Typography.Paragraph>
               </Col>
             </Row>
@@ -168,7 +173,7 @@ class Movie extends React.Component {
               >
                 <Typography.Paragraph>
                   <b>Original Language: </b>
-                  <span>English</span>
+                  <span>{originalLanguage}</span>
                 </Typography.Paragraph>
               </Col>
               <Col
@@ -177,7 +182,7 @@ class Movie extends React.Component {
               >
                 <Typography.Paragraph>
                   <b>Runtime: </b>
-                  <span>3h 1m</span>
+                  <span>{runtime}</span>
                 </Typography.Paragraph>
               </Col>
               <Col
@@ -186,7 +191,7 @@ class Movie extends React.Component {
               >
                 <Typography.Paragraph>
                   <b>Budget: </b>
-                  <span>$356,000,000.00</span>
+                  <span>{budget}</span>
                 </Typography.Paragraph>
               </Col>
               <Col
@@ -195,7 +200,7 @@ class Movie extends React.Component {
               >
                 <Typography.Paragraph>
                   <b>Revenue: </b>
-                  <span>$2,742,491,359.00</span>
+                  <span>{revenue}</span>
                 </Typography.Paragraph>
               </Col>
               <Col
@@ -204,9 +209,9 @@ class Movie extends React.Component {
               >
                 <Typography.Paragraph>
                   <b>Genres: </b>
-                  <Tag>ADVENTURE</Tag>
-                  <Tag>SCIENCE FICTION</Tag>
-                  <Tag>ACTION</Tag>
+                  {genres.map(genre => (
+                    <Tag key={genre.id}>{genre.name.toUpperCase()}</Tag>
+                  ))}
                 </Typography.Paragraph>
               </Col>
             </Row>
@@ -227,9 +232,9 @@ class Movie extends React.Component {
                 span={20}
                 offset={2}
               >
-                {range(10).map(index => (
+                {credits.cast.map(role => (
                   <Col
-                    key={index}
+                    key={role.cast_id}
                     xs={{ span: 12 }}
                     sm={{ span: 8 }}
                     md={{ span: 6 }}
@@ -239,15 +244,15 @@ class Movie extends React.Component {
                     <Card
                       cover={(
                         <img
-                          alt="example"
-                          src="https://m.media-amazon.com/images/M/MV5BNzg1MTUyNDYxOF5BMl5BanBnXkFtZTgwNTQ4MTE2MjE@._V1_.jpg"
+                          alt="profile"
+                          src={`https://image.tmdb.org/t/p/w276_and_h350_face${role.profile_path}`}
                         />
-)}
+                      )}
                       className="top-margin"
                     >
                       <Card.Meta
-                        title="Robert Downey Jr."
-                        description="Ironman"
+                        title={role.name}
+                        description={role.character}
                       />
                     </Card>
                   </Col>
@@ -271,9 +276,9 @@ class Movie extends React.Component {
                 span={20}
                 offset={2}
               >
-                {range(10).map(index => (
+                {credits.crew.map(member => (
                   <Col
-                    key={index}
+                    key={member.credit_id}
                     xs={{ span: 12 }}
                     sm={{ span: 8 }}
                     md={{ span: 6 }}
@@ -283,15 +288,15 @@ class Movie extends React.Component {
                     <Card
                       cover={(
                         <img
-                          alt="example"
-                          src="https://m.media-amazon.com/images/M/MV5BNzg1MTUyNDYxOF5BMl5BanBnXkFtZTgwNTQ4MTE2MjE@._V1_.jpg"
+                          alt="profile"
+                          src={`https://image.tmdb.org/t/p/w276_and_h350_face${member.profile_path}`}
                         />
-)}
+                      )}
                       className="top-margin"
                     >
                       <Card.Meta
-                        title="Robert Downey Jr."
-                        description="Ironman"
+                        title={member.name}
+                        description={member.job}
                       />
                     </Card>
                   </Col>
@@ -312,4 +317,81 @@ class Movie extends React.Component {
     )
   }
 }
-export default Movie
+
+Movie.propTypes = {
+  previousId: PropTypes.number,
+  status: PropTypes.oneOf(Object.values(statuses)).isRequired,
+  title: PropTypes.string.isRequired,
+  year: PropTypes.number.isRequired,
+  overview: PropTypes.string.isRequired,
+  originalLanguage: PropTypes.string.isRequired,
+  runtime: PropTypes.string.isRequired,
+  budget: PropTypes.string.isRequired,
+  revenue: PropTypes.string.isRequired,
+  genres: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number,
+      name: PropTypes.string
+    })
+  ).isRequired,
+  credits: PropTypes.shape({
+    cast: PropTypes.arrayOf(
+      PropTypes.shape({
+        cast_id: PropTypes.number.isRequired,
+        character: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        profile_path: PropTypes.string
+      })
+    ),
+    crew: PropTypes.arrayOf(
+      PropTypes.shape({
+        credit_id: PropTypes.string.isRequired,
+        job: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        profile_path: PropTypes.string
+      })
+    )
+  }).isRequired,
+  backdrops: PropTypes.arrayOf(
+    PropTypes.shape({
+      file_path: PropTypes.string.isRequired
+    })
+  ).isRequired,
+  onFetch: PropTypes.func.isRequired,
+  location: PropTypes.shape({
+    state: PropTypes.shape({
+      id: PropTypes.number.isRequired
+    })
+  }).isRequired
+}
+
+Movie.defaultProps = {
+  previousId: null
+}
+
+const mapStateToProps = (state) => {
+  const {
+    previousId, status, title, year, overview, originalLanguage, runtime, budget,
+    revenue, genres, credits, backdrops
+  } = state.movie
+  return {
+    previousId,
+    status,
+    title,
+    year,
+    overview,
+    originalLanguage,
+    runtime,
+    budget,
+    revenue,
+    genres,
+    credits,
+    backdrops
+  }
+}
+
+const mapDispatchToProps = dispatch => ({
+  onFetch: id => dispatch(actions.fetch(id))
+})
+
+export default connect(mapStateToProps, mapDispatchToProps)(Movie)

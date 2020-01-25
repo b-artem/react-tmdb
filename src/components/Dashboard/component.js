@@ -63,6 +63,7 @@ const Dashboard = (props) => {
               >
                 <MovieItem
                   key={item.id}
+                  id={item.id}
                   title={item.title}
                   overview={item.overview}
                   posterPath={item.posterPath}
