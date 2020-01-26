@@ -4,8 +4,10 @@ import moment from 'moment'
 import isoLangs from '../../vendor/isoLangs'
 
 import {
-  MOVIE_FETCH, MOVIE_FETCH_SUCCESS, MOVIE_FETCH_FAIL
+  MOVIE_FETCH, MOVIE_FETCH_SUCCESS, MOVIE_FETCH_FAIL,
+  MOVIE_TOGGLE_LIST, MOVIE_TOGGLE_LIST_SUCCESS, MOVIE_TOGGLE_LIST_FAIL
 } from './actions'
+import { listTypes } from './component'
 
 export const fetchLogic = createLogic({
   type: MOVIE_FETCH,
@@ -18,13 +20,18 @@ export const fetchLogic = createLogic({
   },
 
   process({ httpClient, getState }) {
+    const { sessionId } = getState().auth
     const { id } = getState().movie
-    const params = { append_to_response: 'credits,images' }
+
+    const params = {
+      session_id: sessionId,
+      append_to_response: 'credits,images,account_states'
+    }
 
     return httpClient.get(`/movie/${id}`, { params }).then((resp) => {
       const {
         title, release_date: releaseDate, overview, original_language: originalLanguage,
-        runtime, budget, revenue, genres, credits, images
+        runtime, budget, revenue, genres, credits, images, account_states: accountStates
       } = resp.data
 
       const hours = Math.floor(runtime / 60)
@@ -41,62 +48,48 @@ export const fetchLogic = createLogic({
         revenue: `$${revenue.toLocaleString()}`,
         genres,
         credits,
-        backdrops: images.backdrops.slice(0, 3)
+        backdrops: images.backdrops.slice(0, 3),
+        accountStates
       }
     })
   }
 })
 
-// export const deleteListLogic = createLogic({
-//   type: MOVIE_DELETE,
-//
-//   throttle: 1000,
-//
-//   processOptions: {
-//     successType: MOVIE_DELETE_SUCCESS,
-//     failType: MOVIE_DELETE_FAIL
-//   },
-//
-//   process({ httpClient, getState }) {
-//     const { sessionId } = getState().auth
-//     const { id, redirectCallback } = getState().listDetails
-//
-//     const params = { session_id: sessionId }
-//
-//     return httpClient.delete(`/list/${id}`, { params }).then(() => {
-//       redirectCallback()
-//     }).catch(() => {
-//       // At the moment of writing, API returns status 500, although it deletes a list
-//       redirectCallback()
-//     })
-//   }
-// })
-//
-// export const deleteMovieLogic = createLogic({
-//   type: MOVIE_DELETE_MOVIE,
-//
-//   throttle: 1000,
-//
-//   processOptions: {
-//     successType: MOVIE_DELETE_MOVIE_SUCCESS,
-//     failType: MOVIE_DELETE_MOVIE_FAIL
-//   },
-//
-//   process({ httpClient, getState }) {
-//     const { sessionId } = getState().auth
-//     const { listId, movieId } = getState().listDetails
-//
-//     const body = { media_id: movieId }
-//     const params = { session_id: sessionId }
-//
-//     return httpClient.post(`/list/${listId}/remove_item`, body, { params }).then(() => {
-//       const { movies } = getState().listDetails
-//       const newMovies = movies.filter(movie => movie.id !== movieId)
-//       return { movies: newMovies }
-//     })
-//   }
-// })
+export const toggleListLogic = createLogic({
+  type: MOVIE_TOGGLE_LIST,
+
+  throttle: 1000,
+
+  processOptions: {
+    successType: MOVIE_TOGGLE_LIST_SUCCESS,
+    failType: MOVIE_TOGGLE_LIST_FAIL
+  },
+
+  process({ httpClient, getState }) {
+    const { accountId, sessionId } = getState().auth
+    const {
+      id, listType, belongsToList, accountStates
+    } = getState().movie
+
+    const key = listType === listTypes.FAVORITES ? 'favorite' : 'watchlist'
+    const path = `/account/${accountId}/${key}`
+
+    const params = { session_id: sessionId }
+
+    const body = { media_type: 'movie', media_id: id }
+    body[key] = belongsToList
+
+    return httpClient.post(path, body, { params }).then(() => {
+      accountStates[key] = belongsToList
+      return {
+        previousId: id,
+        accountStates
+      }
+    })
+  }
+})
 
 export default [
-  fetchLogic
+  fetchLogic,
+  toggleListLogic
 ]

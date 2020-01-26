@@ -29,6 +29,14 @@ export const statuses = {
   EMPTY
 }
 
+const FAVORITES = 'FAVORITES'
+const WATCHLIST = 'WATCHLIST'
+
+export const listTypes = {
+  FAVORITES,
+  WATCHLIST
+}
+
 const PopoverContent = ({ openModal, closePopover }) => (
   <React.Fragment>
     <div>
@@ -65,9 +73,7 @@ class Movie extends React.Component {
 
     this.state = {
       modalVisible: false,
-      popoverVisible: false,
-      bookmarked: false,
-      watchlist: false
+      popoverVisible: false
     }
 
     this.handleVisiblePopover = (visible) => {
@@ -81,23 +87,16 @@ class Movie extends React.Component {
     this.hideModal = () => {
       this.setState({ modalVisible: false })
     }
-
-    this.handleWatchlist = () => {
-      this.setState(state => ({ watchlist: !state.watchlist }))
-    }
-
-    this.handleBookmark = () => {
-      this.setState(state => ({ bookmarked: !state.bookmarked }))
-    }
   }
 
   render() {
     const {
-      modalVisible, popoverVisible, bookmarked, watchlist
+      modalVisible, popoverVisible
     } = this.state
     const {
-      previousId, status, title, year, overview, originalLanguage, runtime, budget,
-      revenue, genres, credits, backdrops, onFetch, location
+      previousId, status, title, year, overview, originalLanguage, runtime,
+      budget, revenue, genres, credits, backdrops, favorite, watchlist,
+      onFetch, onToggleList, location
     } = this.props
     const { id } = location.state
 
@@ -150,14 +149,14 @@ class Movie extends React.Component {
                   {' '}
                   <Icon
                     type="heart"
-                    theme={watchlist ? 'filled' : undefined}
-                    onClick={this.handleWatchlist}
+                    theme={favorite ? 'filled' : undefined}
+                    onClick={() => onToggleList(id, listTypes.FAVORITES, !favorite)}
                   />
                   {' '}
                   <Icon
                     type="book"
-                    theme={bookmarked ? 'filled' : undefined}
-                    onClick={this.handleBookmark}
+                    theme={watchlist ? 'filled' : undefined}
+                    onClick={() => onToggleList(id, listTypes.WATCHLIST, !watchlist)}
                   />
                 </Typography.Title>
                 <Typography.Title level={3}>Overview</Typography.Title>
@@ -357,7 +356,10 @@ Movie.propTypes = {
       file_path: PropTypes.string.isRequired
     })
   ).isRequired,
+  favorite: PropTypes.bool.isRequired,
+  watchlist: PropTypes.bool.isRequired,
   onFetch: PropTypes.func.isRequired,
+  onToggleList: PropTypes.func.isRequired,
   location: PropTypes.shape({
     state: PropTypes.shape({
       id: PropTypes.number.isRequired
@@ -372,7 +374,7 @@ Movie.defaultProps = {
 const mapStateToProps = (state) => {
   const {
     previousId, status, title, year, overview, originalLanguage, runtime, budget,
-    revenue, genres, credits, backdrops
+    revenue, genres, credits, backdrops, accountStates
   } = state.movie
   return {
     previousId,
@@ -386,12 +388,17 @@ const mapStateToProps = (state) => {
     revenue,
     genres,
     credits,
-    backdrops
+    backdrops,
+    favorite: accountStates.favorite,
+    watchlist: accountStates.watchlist
   }
 }
 
 const mapDispatchToProps = dispatch => ({
-  onFetch: id => dispatch(actions.fetch(id))
+  onFetch: id => dispatch(actions.fetch(id)),
+  onToggleList: (id, listType, belongsToList) => {
+    dispatch(actions.toggleList(id, listType, belongsToList))
+  }
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Movie)
