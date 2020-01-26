@@ -60,14 +60,10 @@ export const storeSessionLogic = createLogic({
   type: AUTH_STORE_SESSION,
 
   processOptions: {
-    successType: AUTH_GET_ACCOUNT_DETAILS,
-    failType: AUTH_FAIL
+    successType: AUTH_GET_ACCOUNT_DETAILS
   },
 
-  process({ cookies, getState }) {
-    const { sessionId } = getState().auth
-    return cookies.set('session_id', sessionId)
-  }
+  process() { return true }
 })
 
 export const getAccountDetailsLogic = createLogic({
@@ -96,18 +92,15 @@ export const logoutLogic = createLogic({
     failType: LOGOUT_FAIL
   },
 
-  process({ httpClient, cookies }) {
-    const sessionId = cookies.get('session_id')
+  process({ httpClient, getState }) {
+    const { sessionId } = getState().auth
 
     return httpClient.delete(
       '/authentication/session',
       {
         data: { session_id: sessionId }
       }
-    ).then((resp) => {
-      cookies.remove('session_id')
-      return resp.data
-    })
+    ).then(resp => resp.data)
   }
 })
 

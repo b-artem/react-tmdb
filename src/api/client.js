@@ -1,5 +1,4 @@
 import axios from 'axios'
-import Cookies from 'js-cookie'
 
 const baseURL = 'https://api.themoviedb.org/3/'
 
@@ -13,11 +12,6 @@ client.interceptors.request.use((config) => {
 
   const params = newConfig.params || {}
   newConfig.params = { ...params, api_key: process.env.API_KEY }
-
-  const token = Cookies.get('auth_token')
-  if (token) {
-    newConfig.headers = { Authorization: `Bearer ${token}` }
-  }
 
   return newConfig
 })

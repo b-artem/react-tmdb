@@ -25,29 +25,21 @@ export default function reducer(state = initialState, action) {
     case AUTH_VALIDATE_TOKEN:
       return {
         ...state,
-        requestToken: action.payload.request_token,
-        loading: true
+        requestToken: action.payload.request_token
       }
     case AUTH_CREATE_SESSION: {
       const { password, ...newState } = state
-      return {
-        ...newState,
-        loading: true
-      }
+      return newState
     }
     case AUTH_STORE_SESSION: {
       const { requestToken, ...newState } = state
       return {
         ...newState,
-        sessionId: action.payload.session_id,
-        loading: true
+        sessionId: action.payload.session_id
       }
     }
     case AUTH_GET_ACCOUNT_DETAILS: {
-      return {
-        ...state,
-        loading: true
-      }
+      return state
     }
     case AUTH_SUCCESS: {
       return {
@@ -73,7 +65,9 @@ export default function reducer(state = initialState, action) {
     case LOGOUT:
       return state
     case LOGOUT_SUCCESS: {
-      const { username, ...newState } = state
+      const {
+        username, sessionId, accountId, ...newState
+      } = state
       return {
         ...newState,
         isAuthenticated: false

@@ -3,7 +3,6 @@ import { createStore, applyMiddleware } from 'redux'
 import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage' // defaults to localStorage for web
 
-import Cookies from 'js-cookie'
 import client from '../api/client'
 import logics from './logics'
 import rootReducer from './rootReducer'
@@ -30,8 +29,7 @@ const persistedReducer = persistReducer(persistConfig, rootReducer)
 const configureStore = (initialState = {}) => {
   // Add dependencies to pass them to logic functions
   const dependencies = {
-    httpClient: client,
-    cookies: Cookies
+    httpClient: client
   }
 
   const logicMiddleware = createLogicMiddleware(logics, dependencies)
