@@ -5,7 +5,9 @@ import isoLangs from '../../vendor/isoLangs'
 
 import {
   MOVIE_FETCH, MOVIE_FETCH_SUCCESS, MOVIE_FETCH_FAIL,
-  MOVIE_TOGGLE_LIST, MOVIE_TOGGLE_LIST_SUCCESS, MOVIE_TOGGLE_LIST_FAIL
+  MOVIE_TOGGLE_LIST, MOVIE_TOGGLE_LIST_SUCCESS, MOVIE_TOGGLE_LIST_FAIL,
+  MOVIE_CREATE_LIST, MOVIE_CREATE_LIST_SUCCESS, MOVIE_CREATE_LIST_FAIL,
+  MOVIE_ADD_TO_LIST, MOVIE_ADD_TO_LIST_SUCCESS, MOVIE_ADD_TO_LIST_FAIL
 } from './actions'
 import { listTypes } from './component'
 
@@ -89,7 +91,65 @@ export const toggleListLogic = createLogic({
   }
 })
 
+export const createListLogic = createLogic({
+  type: MOVIE_CREATE_LIST,
+
+  throttle: 1000,
+
+  processOptions: {
+    successType: MOVIE_CREATE_LIST_SUCCESS,
+    failType: MOVIE_CREATE_LIST_FAIL
+  },
+
+  process({ httpClient, getState }) {
+    const { sessionId } = getState().auth
+    const { listName, listDescription } = getState().movie
+
+    const body = { name: listName, description: listDescription }
+    const params = { session_id: sessionId }
+
+    return httpClient.post('/list', body, { params }).then((resp) => {
+      const listId = resp.data.list_id
+      return { listId }
+    })
+  }
+})
+
+export const createListSuccessLogic = createLogic({
+  type: MOVIE_CREATE_LIST_SUCCESS,
+
+  processOptions: {
+    successType: MOVIE_ADD_TO_LIST
+  },
+
+  process() { return true }
+})
+
+export const addToListLogic = createLogic({
+  type: MOVIE_ADD_TO_LIST,
+
+  throttle: 1000,
+
+  processOptions: {
+    successType: MOVIE_ADD_TO_LIST_SUCCESS,
+    failType: MOVIE_ADD_TO_LIST_FAIL
+  },
+
+  process({ httpClient, getState }) {
+    const { sessionId } = getState().auth
+    const { id, listId } = getState().movie
+
+    const body = { media_id: id }
+    const params = { session_id: sessionId }
+
+    return httpClient.post(`/list/${listId}/add_item`, body, { params })
+  }
+})
+
 export default [
   fetchLogic,
-  toggleListLogic
+  toggleListLogic,
+  createListLogic,
+  createListSuccessLogic,
+  addToListLogic
 ]

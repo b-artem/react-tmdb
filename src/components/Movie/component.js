@@ -11,13 +11,13 @@ import {
   Card,
   Tag,
   Popover,
-  Button,
-  Modal
+  Button
 } from 'antd'
 
 import Header from '../Header'
 import CreateListModal from '../CreateListModal'
 import { actions } from './actions'
+import { actions as listsActions } from '../Lists/actions'
 
 const LOADED = 'LOADED'
 const LOADING = 'LOADING'
@@ -37,7 +37,9 @@ export const listTypes = {
   WATCHLIST
 }
 
-const PopoverContent = ({ openModal, closePopover }) => (
+const PopoverContent = ({
+  lists, addToExistingList, openModal, closePopover
+}) => (
   <React.Fragment>
     <div>
       <Button
@@ -50,19 +52,30 @@ const PopoverContent = ({ openModal, closePopover }) => (
         Create new list ...
       </Button>
     </div>
-    <div>
-      <Button type="link">List 1</Button>
-    </div>
-    <div>
-      <Button type="link">List 2</Button>
-    </div>
-    <div>
-      <Button type="link">List 3</Button>
-    </div>
+    {lists.map(list => (
+      <div key={list.id}>
+        <Button
+          type="link"
+          onClick={() => {
+            addToExistingList(list.id)
+            closePopover()
+          }}
+        >
+          {list.name}
+        </Button>
+      </div>
+    ))}
   </React.Fragment>
 )
 
 PopoverContent.propTypes = {
+  lists: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      name: PropTypes.string.isRequired
+    })
+  ).isRequired,
+  addToExistingList: PropTypes.func.isRequired,
   openModal: PropTypes.func.isRequired,
   closePopover: PropTypes.func.isRequired
 }
@@ -87,6 +100,26 @@ class Movie extends React.Component {
     this.hideModal = () => {
       this.setState({ modalVisible: false })
     }
+
+    this.saveFormRef = (formRef) => {
+      this.formRef = formRef
+    }
+
+    this.handleAddToNewList = () => {
+      const { form } = this.formRef.props
+
+      form.validateFields((err, values) => {
+        if (err) return
+
+        const { onAddToNewList } = this.props
+        const { name, description } = values
+
+        onAddToNewList(name, description)
+
+        form.resetFields()
+        this.setState({ modalVisible: false })
+      })
+    }
   }
 
   render() {
@@ -95,14 +128,16 @@ class Movie extends React.Component {
     } = this.state
     const {
       previousId, status, title, year, overview, originalLanguage, runtime,
-      budget, revenue, genres, credits, backdrops, favorite, watchlist,
-      onFetch, onToggleList, location
+      budget, revenue, genres, credits, backdrops, favorite, watchlist, lists, listsStatus,
+      onFetch, onToggleList, onFetchLists, onAddToExistingList, location
     } = this.props
     const { id } = location.state
 
     if (status !== LOADED || previousId !== id) {
       onFetch(id)
     }
+
+    if (listsStatus !== LOADED) { onFetchLists() }
 
     return (
       <Layout>
@@ -139,6 +174,8 @@ class Movie extends React.Component {
                     onVisibleChange={this.handleVisiblePopover}
                     content={(
                       <PopoverContent
+                        lists={lists}
+                        addToExistingList={onAddToExistingList}
                         openModal={this.showModal}
                         closePopover={() => this.handleVisiblePopover(false)}
                       />
@@ -304,14 +341,12 @@ class Movie extends React.Component {
             </Row>
           </div>
         </Layout.Content>
-        <Modal
+        <CreateListModal
+          wrappedComponentRef={this.saveFormRef}
           visible={modalVisible}
           onCancel={this.hideModal}
-          okText="Create"
-          title="Create list"
-        >
-          <CreateListModal />
-        </Modal>
+          onOk={this.handleAddToNewList}
+        />
       </Layout>
     )
   }
@@ -358,8 +393,18 @@ Movie.propTypes = {
   ).isRequired,
   favorite: PropTypes.bool.isRequired,
   watchlist: PropTypes.bool.isRequired,
+  lists: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      name: PropTypes.string.isRequired
+    })
+  ),
+  listsStatus: PropTypes.oneOf(Object.values(statuses)).isRequired,
   onFetch: PropTypes.func.isRequired,
   onToggleList: PropTypes.func.isRequired,
+  onFetchLists: PropTypes.func.isRequired,
+  onAddToNewList: PropTypes.func.isRequired,
+  onAddToExistingList: PropTypes.func.isRequired,
   location: PropTypes.shape({
     state: PropTypes.shape({
       id: PropTypes.number.isRequired
@@ -368,7 +413,8 @@ Movie.propTypes = {
 }
 
 Movie.defaultProps = {
-  previousId: null
+  previousId: null,
+  lists: []
 }
 
 const mapStateToProps = (state) => {
@@ -376,6 +422,7 @@ const mapStateToProps = (state) => {
     previousId, status, title, year, overview, originalLanguage, runtime, budget,
     revenue, genres, credits, backdrops, accountStates
   } = state.movie
+  const { lists, status: listsStatus } = state.lists
   return {
     previousId,
     status,
@@ -390,7 +437,9 @@ const mapStateToProps = (state) => {
     credits,
     backdrops,
     favorite: accountStates.favorite,
-    watchlist: accountStates.watchlist
+    watchlist: accountStates.watchlist,
+    lists,
+    listsStatus
   }
 }
 
@@ -398,6 +447,13 @@ const mapDispatchToProps = dispatch => ({
   onFetch: id => dispatch(actions.fetch(id)),
   onToggleList: (id, listType, belongsToList) => {
     dispatch(actions.toggleList(id, listType, belongsToList))
+  },
+  onFetchLists: () => dispatch(listsActions.fetch(1)),
+  onAddToNewList: (listName, listDescription) => {
+    dispatch(actions.addToNewList(listName, listDescription))
+  },
+  onAddToExistingList: (listId) => {
+    dispatch(actions.addToExistingList(listId))
   }
 })
 
