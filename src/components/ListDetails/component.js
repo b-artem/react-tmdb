@@ -6,7 +6,6 @@ import {
 } from 'antd'
 
 import Header from '../Header'
-import CreateListModal from '../CreateListModal'
 import MovieItem from '../MovieItem'
 import { actions } from './actions'
 
@@ -44,16 +43,6 @@ class ListDetails extends React.Component {
   constructor(props) {
     super(props)
 
-    this.state = { modalVisible: false }
-
-    this.showModal = () => {
-      this.setState({ modalVisible: true })
-    }
-
-    this.hideModal = () => {
-      this.setState({ modalVisible: false })
-    }
-
     this.redirectToLists = () => {
       const { history } = this.props
       history.push('/lists', { doReload: true })
@@ -66,7 +55,6 @@ class ListDetails extends React.Component {
       onFetch, onDeleteList, onDeleteMovie, location
     } = this.props
     const { id } = location.state
-    const { modalVisible } = this.state
 
     if (status !== LOADED || previousId !== id) {
       onFetch(id, page)
@@ -181,14 +169,6 @@ class ListDetails extends React.Component {
           {pagination}
 
         </Layout.Content>
-        <Modal
-          visible={modalVisible}
-          onCancel={this.hideModal}
-          okText="Create"
-          title="Create list"
-        >
-          <CreateListModal />
-        </Modal>
       </Layout>
     )
   }

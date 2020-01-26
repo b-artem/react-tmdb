@@ -39,7 +39,7 @@ const showDeleteMovieModal = (event, onDelete, listType, id) => {
   })
 }
 
-const Favorites = (props) => {
+const MovieList = (props) => {
   const {
     listType, previousListType, status, onFetch, onDelete, movies, page, totalResults
   } = props
@@ -156,7 +156,7 @@ const Favorites = (props) => {
   )
 }
 
-Favorites.propTypes = {
+MovieList.propTypes = {
   listType: PropTypes.oneOf(Object.values(listTypes)).isRequired,
   previousListType: PropTypes.oneOf(Object.values(listTypes)),
   status: PropTypes.oneOf(Object.values(statuses)).isRequired,
@@ -174,7 +174,7 @@ Favorites.propTypes = {
   totalResults: PropTypes.number
 }
 
-Favorites.defaultProps = {
+MovieList.defaultProps = {
   previousListType: null,
   movies: [],
   page: 1,
@@ -195,4 +195,4 @@ const mapDispatchToProps = dispatch => ({
   onDelete: (listType, id) => dispatch(actions.deleteMovie(listType, id))
 })
 
-export default connect(mapStateToProps, mapDispatchToProps)(Favorites)
+export default connect(mapStateToProps, mapDispatchToProps)(MovieList)
