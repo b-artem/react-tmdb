@@ -1,7 +1,6 @@
 import axios from 'axios'
-import Cookies from 'js-cookie'
 
-const baseURL = 'http://localhost:8080/api/'
+const baseURL = 'https://api.themoviedb.org/3/'
 
 const client = axios.create({
   baseURL,
@@ -11,10 +10,8 @@ const client = axios.create({
 client.interceptors.request.use((config) => {
   const newConfig = config
 
-  const token = Cookies.get('auth_token')
-  if (token) {
-    newConfig.headers = { Authorization: `Bearer ${token}` }
-  }
+  const params = newConfig.params || {}
+  newConfig.params = { ...params, api_key: process.env.API_KEY }
 
   return newConfig
 })

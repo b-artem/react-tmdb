@@ -22,7 +22,7 @@ class OtherComponent extends React.Component {
 const WrappedComponent = connect()(MockComponent)
 
 describe('diveTo helper', () => {
-  const store = configureStore()({})
+  const { store } = configureStore()({})
   store.dispatch = jest.fn()
   const component = shallow(<WrappedComponent store={store} />)
 
